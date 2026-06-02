@@ -2,9 +2,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Ensure the build output is compatible with Netlify
-  output: 'standalone',
-  // Optional: trailing slash for cleaner URLs (optional)
+  // Export as static site for Netlify
+  output: 'export',
   trailingSlash: true,
   // Disable linting during build for Netlify
   eslint: { ignoreDuringBuilds: true },
