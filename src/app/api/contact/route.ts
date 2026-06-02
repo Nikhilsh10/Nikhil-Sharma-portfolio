@@ -1,20 +1,19 @@
-import React from 'react';
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
 /**
- * Simple React email template used by Resend SDK.
+ * Simple HTML email template used by Resend SDK.
  */
 function EmailTemplate({ name, email, message }: { name: string; email: string; message: string }) {
-  return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+  return `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
       <h2>New Contact Form Submission</h2>
-      <p><strong>Name:</strong> {name}</p>
-      <p><strong>Email:</strong> {email}</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
       <p><strong>Message:</strong></p>
-      <p>{message}</p>
+      <p>${message}</p>
     </div>
-  );
+  `;
 }
 
 export async function POST(req: Request) {
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
       from: process.env.RESEND_FROM_EMAIL!, // e.g. "Your Name <you@domain.com>"
       to: process.env.RESEND_TO_EMAIL!, // where you want to receive the email
       subject,
-      react: EmailTemplate({ name, email, message }),
+      html: EmailTemplate({ name, email, message }),
     });
 
     return NextResponse.json({ success: true, result }, { status: 200 });
