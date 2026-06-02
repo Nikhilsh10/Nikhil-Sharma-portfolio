@@ -1,0 +1,42 @@
+[
+  {
+    "title": "AgriFuture-INDIA",
+    "description": "Live ML platform for agricultural decision support, deployed on Render.",
+    "image": "assets/project-images/agrifuture_project.png",
+    "tags": ["Python", "Machine Learning", "Streamlit", "AWS"],
+    "liveLink": "https://final-year-pjf9.onrender.com/",
+    "repoLink": "https://github.com/Nikhilsh10/AgriFuture-INDIA"
+  },
+  {
+    "title": "RAG-QA-System",
+    "description": "Retrieval‑augmented generation question‑answer system using LangChain.",
+    "image": "assets/project-images/ragqa_project.png",
+    "tags": ["Python", "LLM", "LangChain", "OpenAI"],
+    "liveLink": "https://github.com/Nikhilsh10/RAG-QA-System",
+    "repoLink": "https://github.com/Nikhilsh10/RAG-QA-System"
+  },
+  {
+    "title": "Deepfake Detector",
+    "description": "CNN‑based detector for synthetic media, with a demo interface.",
+    "image": "assets/project-images/deepfake_project.png",
+    "tags": ["Python", "TensorFlow", "Computer Vision"],
+    "liveLink": "https://github.com/Nikhilsh10/deepfake-detector",
+    "repoLink": "https://github.com/Nikhilsh10/deepfake-detector"
+  },
+  {
+    "title": "Crop Recommendation System",
+    "description": "ML model recommending optimal crops based on soil and climate data.",
+    "image": "assets/project-images/crop_recommendation.png",
+    "tags": ["Python", "Scikit‑learn"],
+    "liveLink": "https://greengrow.streamlit.app/",
+    "repoLink": "https://github.com/Nikhilsh10/upskillcampus/blob/main/nikhil.py"
+  },
+  {
+    "title": "Bank Loan Case Study",
+    "description": "Exploratory data analysis of loan defaults for credit risk assessment.",
+    "image": "assets/project-images/bank_loan.png",
+    "tags": ["Excel", "Risk Analysis"],
+    "liveLink": "https://drive.google.com/file/d/1N2fglqW4K66d4PKBm5MfSsNCuAocnU2U/view?usp=drive_link",
+    "repoLink": ""
+  }
+]
