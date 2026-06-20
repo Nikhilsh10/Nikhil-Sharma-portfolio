@@ -55,7 +55,7 @@ export default function Hero() {
             <span className="text-caption text-textTertiary">ML/AI projects shipped</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-h1 font-medium text-textPrimary">9.2</span>
+            <span className="text-h1 font-medium text-textPrimary">9.24</span>
             <span className="text-caption text-textTertiary">CGPA</span>
           </div>
           <div className="flex flex-col">

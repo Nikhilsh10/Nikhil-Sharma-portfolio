@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #5B4FCF;
+  --color-primary: #B0491F;
   --color-success: #1D9E75;
   --color-featured: #BA7517;
   --color-surface: #F1EFE8;
@@ -34,7 +34,7 @@
 
 @layer base {
   .dark {
-    --color-primary: #7F77DD;
+    --color-primary: #E8915F;
     --color-success: #5DCAA5;
     --color-featured: #EF9F27;
     --color-surface: #2C2C2A;

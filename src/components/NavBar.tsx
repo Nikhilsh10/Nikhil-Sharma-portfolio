@@ -46,8 +46,8 @@ export default function NavBar() {
     <motion.nav
       initial={{ backgroundColor: 'rgba(255, 255, 255, 0)', borderBottomColor: 'rgba(0, 0, 0, 0)' }}
       animate={{ 
-        backgroundColor: scrolled ? 'var(--bg-nav)' : 'rgba(255, 255, 255, 0)',
-        borderBottomColor: scrolled ? 'var(--color-border)' : 'rgba(0, 0, 0, 0)',
+        backgroundColor: scrolled ? 'var(--color-nav)' : 'rgba(255, 255, 255, 0)',
+        borderBottomColor: scrolled ? 'var(--color-borderCustom)' : 'rgba(0, 0, 0, 0)',
         backdropFilter: scrolled ? 'blur(12px)' : 'blur(0px)'
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}

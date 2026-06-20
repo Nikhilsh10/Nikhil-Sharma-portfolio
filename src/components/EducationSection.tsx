@@ -27,7 +27,7 @@ export default function EducationSection() {
               <span className="hidden sm:inline">·</span>
               <span>2022–2026</span>
               <span className="hidden sm:inline">·</span>
-              <span className="font-medium text-textPrimary">CGPA 9.2</span>
+              <span className="font-medium text-textPrimary">CGPA 9.24</span>
             </div>
           </div>
         </div>

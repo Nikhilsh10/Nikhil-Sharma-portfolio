@@ -20,15 +20,18 @@ export default function ContactSection() {
           <div className="mb-8 overflow-hidden rounded-full w-[120px] h-[120px] bg-primary/10 relative flex items-center justify-center">
             <span className="text-[40px] font-medium text-primary select-none" id="avatar-initials">NS</span>
             {/* Drop your square-cropped photo into public/avatar.jpg — it will auto-display */}
-            <img 
+            <Image 
               src="/avatar.jpg" 
-              alt="Nikhil Sharma" 
+              alt="Nikhil Sharma"
+              width={120}
+              height={120}
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ display: 'none' }}
-              onLoad={(e) => {
-                e.currentTarget.style.display = 'block';
+              onLoad={() => {
                 const initials = document.getElementById('avatar-initials');
                 if (initials) initials.style.display = 'none';
+              }}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
               }}
             />
           </div>
