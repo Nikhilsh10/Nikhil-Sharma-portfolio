@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #5B4FCF;
+  --color-success: #1D9E75;
+  --color-featured: #BA7517;
+  --color-surface: #F1EFE8;
+  --color-surfaceHover: #E8E5DA;
+  --color-textPrimary: #111111;
+  --color-textSecondary: #5F5E5A;
+  --color-textTertiary: #73726B;
+  --color-borderCustom: rgba(0, 0, 0, 0.15);
+  --color-borderHover: rgba(0, 0, 0, 0.25);
+  --color-main: #FFFFFF;
+  --color-nav: rgba(255, 255, 255, 0.8);
+  
+  --font-sans: "Inter", sans-serif;
+  
+  --text-display: 36px;
+  --text-h1: 22px;
+  --text-h2: 18px;
+  --text-h3: 16px;
+  --text-bodyLg: 16px;
+  --text-body: 14px;
+  --text-bodySm: 13px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+  
+  --radius-micro: 4px;
+  --radius-btn: 8px;
+  --radius-card: 12px;
+  --radius-pill: 20px;
+}
+
+@layer base {
+  .dark {
+    --color-primary: #7F77DD;
+    --color-success: #5DCAA5;
+    --color-featured: #EF9F27;
+    --color-surface: #2C2C2A;
+    --color-surfaceHover: #3A3A38;
+    --color-textPrimary: #EFEFEF;
+    --color-textSecondary: #B4B2A9;
+    --color-textTertiary: #888780;
+    --color-borderCustom: rgba(255, 255, 255, 0.15);
+    --color-borderHover: rgba(255, 255, 255, 0.25);
+    --color-main: #1A1A1A;
+    --color-nav: rgba(26, 26, 26, 0.8);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-main);
+    color: var(--color-textPrimary);
+  }
+}
+
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-main;
+  }
+}
