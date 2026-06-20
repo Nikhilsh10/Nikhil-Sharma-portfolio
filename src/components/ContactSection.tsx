@@ -17,20 +17,23 @@ export default function ContactSection() {
         
         {/* Invitation Copy */}
         <div className="flex flex-col">
-          <div className="mb-8 overflow-hidden rounded-full w-[120px] h-[120px] bg-borderCustom relative">
-            {/* The user will add public/avatar.jpg later, but we use it here. We use an unoptimized img tag to avoid build errors if missing initially, or Image with a fallback. */}
-            {/* Actually next/image might throw error if file is missing at build time. We use regular <img> tag to be safe if file is added post-build or is missing. */}
+          <div className="mb-8 overflow-hidden rounded-full w-[120px] h-[120px] bg-primary/10 relative flex items-center justify-center">
+            <span className="text-[40px] font-medium text-primary select-none" id="avatar-initials">NS</span>
+            {/* Drop your square-cropped photo into public/avatar.jpg — it will auto-display */}
             <img 
               src="/avatar.jpg" 
               alt="Nikhil Sharma" 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ccc"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ display: 'none' }}
+              onLoad={(e) => {
+                e.currentTarget.style.display = 'block';
+                const initials = document.getElementById('avatar-initials');
+                if (initials) initials.style.display = 'none';
               }}
             />
           </div>
           <h2 className="text-display font-medium text-textPrimary leading-tight mb-4">
-            let's build something that ships.
+            let&apos;s build something that ships.
           </h2>
           <p className="text-bodyLg text-textSecondary max-w-md">
             Currently open to AI/ML internship opportunities and entry-level roles.
