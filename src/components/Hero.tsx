@@ -24,9 +24,11 @@ export default function Hero() {
       <HeroFallback />
 
       {/* Layer 2: 3D Data Lattice — conditionally rendered (see HeroCanvas guards) */}
-      <Suspense fallback={null}>
-        <HeroCanvas />
-      </Suspense>
+      <div className="absolute inset-y-0 right-0 w-full md:w-[58%] lg:w-[52%] opacity-[0.35] md:opacity-100 pointer-events-none">
+        <Suspense fallback={null}>
+          <HeroCanvas />
+        </Suspense>
+      </div>
 
       {/* Layer 3: radial vignette — subtle edge darkening for lattice depth */}
       <div

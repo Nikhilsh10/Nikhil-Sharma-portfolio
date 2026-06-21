@@ -18,23 +18,23 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-/* ─── Curated node positions — organic, non-uniform lattice ─── */
+/* ─── Curated node positions — organic, non-uniform lattice (scaled by 0.8 to fit responsive container) ─── */
 const NODE_POSITIONS: [number, number, number][] = [
   [ 0.00,  0.00,  0.00],
-  [ 1.20,  0.70, -0.40],
-  [-1.10,  0.50,  0.30],
-  [ 0.30, -1.20,  0.60],
-  [-0.80, -0.80, -0.50],
-  [ 1.50, -0.20,  0.70],
-  [-1.30, -0.10, -0.80],
-  [ 0.10,  1.60,  0.30],
-  [-0.40,  0.20,  1.40],
-  [ 0.90,  0.40,  1.10],
-  [-0.80,  1.30, -0.30],
-  [ 0.60, -0.50, -1.20],
+  [ 0.96,  0.56, -0.32],
+  [-0.88,  0.40,  0.24],
+  [ 0.24, -0.96,  0.48],
+  [-0.64, -0.64, -0.40],
+  [ 1.20, -0.16,  0.56],
+  [-1.04, -0.08, -0.64],
+  [ 0.08,  1.28,  0.24],
+  [-0.32,  0.16,  1.12],
+  [ 0.72,  0.32,  0.88],
+  [-0.64,  1.04, -0.24],
+  [ 0.48, -0.40, -0.96],
 ];
 
-const EDGE_THRESHOLD = 1.82;
+const EDGE_THRESHOLD = 1.46;
 
 function buildEdges(
   positions: [number, number, number][],
@@ -110,9 +110,8 @@ export default function HeroCanvas() {
       /* --- Scene --- */
       const scene = new THREE.Scene();
 
-      /* --- Group (offset slightly right so text sits cleanly left) --- */
+      /* --- Group (now centered in the responsive container) --- */
       const group = new THREE.Group();
-      group.position.x = 0.55;
       scene.add(group);
 
       /* --- Lighting (warm copper/terracotta ONLY — no blue tones) --- */
