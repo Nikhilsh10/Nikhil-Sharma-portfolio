@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
 @theme {
+  /* === GRAPHITE & EMBER COLOR SYSTEM === */
   --color-primary: #B0491F;
   --color-success: #1D9E75;
   --color-featured: #BA7517;
+  --color-secondary: #D97B3F;
+
   --color-surface: #F1EFE8;
   --color-surfaceHover: #E8E5DA;
   --color-textPrimary: #111111;
@@ -11,12 +14,16 @@
   --color-textTertiary: #73726B;
   --color-borderCustom: rgba(0, 0, 0, 0.15);
   --color-borderHover: rgba(0, 0, 0, 0.25);
-  --color-main: #FFFFFF;
-  --color-nav: rgba(255, 255, 255, 0.8);
-  
+
+  /* Warm off-white (updated from plain white) */
+  --color-main: #FAF8F4;
+  --color-nav: rgba(250, 248, 244, 0.85);
+
+  /* === TYPOGRAPHY === */
   --font-sans: "Inter", sans-serif;
-  
-  --text-display: 36px;
+
+  /* Hero headline — clamp(2.75rem, 5vw, 3.5rem) via CSS directly */
+  --text-display: 3rem;
   --text-h1: 22px;
   --text-h2: 18px;
   --text-h3: 16px;
@@ -25,27 +32,37 @@
   --text-bodySm: 13px;
   --text-caption: 12px;
   --text-micro: 11px;
-  
+
+  /* === RADII === */
   --radius-micro: 4px;
   --radius-btn: 8px;
   --radius-card: 12px;
   --radius-pill: 20px;
+
+  /* === TRANSITIONS === */
+  --duration-btn-hover: 150ms;
+  --duration-hover: 200ms;
 }
 
 @layer base {
+  /* === DARK MODE TOKENS === */
   .dark {
     --color-primary: #E8915F;
     --color-success: #5DCAA5;
     --color-featured: #EF9F27;
-    --color-surface: #2C2C2A;
-    --color-surfaceHover: #3A3A38;
+    --color-secondary: #F2A268;
+
+    --color-surface: #1C1C1C;
+    --color-surfaceHover: #252525;
     --color-textPrimary: #EFEFEF;
     --color-textSecondary: #B4B2A9;
     --color-textTertiary: #888780;
-    --color-borderCustom: rgba(255, 255, 255, 0.15);
-    --color-borderHover: rgba(255, 255, 255, 0.25);
-    --color-main: #1A1A1A;
-    --color-nav: rgba(26, 26, 26, 0.8);
+    --color-borderCustom: rgba(255, 255, 255, 0.12);
+    --color-borderHover: rgba(255, 255, 255, 0.22);
+
+    /* True graphite — NOT navy-tinted */
+    --color-main: #121212;
+    --color-nav: rgba(18, 18, 18, 0.88);
   }
 
   html {
@@ -53,10 +70,53 @@
     background-color: var(--color-main);
     color: var(--color-textPrimary);
   }
+
+  body {
+    line-height: 1.65;
+  }
 }
 
 @layer utilities {
+  /* Focus ring — accessible keyboard navigation */
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-main;
+  }
+
+  /* Hide scrollbar utility (replaces style jsx in TechStackStrip) */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* === HERO ANIMATIONS === */
+
+/* Radial glow breathing — HeroFallback (respects reduced motion) */
+@keyframes hero-glow-breathe {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
+}
+
+/* Availability badge pulse */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow-anim {
+    animation: none !important;
+  }
+  .status-pulse-anim {
+    animation: none !important;
   }
 }

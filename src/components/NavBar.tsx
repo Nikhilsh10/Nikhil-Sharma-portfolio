@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 export default function NavBar() {
   const [scrolled, setScrolled] = useState(false);
@@ -10,17 +9,19 @@ export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    
-    // Theme initialization
-    if (document.documentElement.classList.contains('dark')) {
-      setIsDark(true);
-    }
-    
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    setIsDark(document.documentElement.classList.contains('dark'));
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (window.innerWidth >= 640) return;
+    const handleResize = () => {
+      if (window.innerWidth >= 640) setMobileMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const toggleTheme = () => {
@@ -36,115 +37,144 @@ export default function NavBar() {
   };
 
   const navLinks = [
-    { name: 'work', href: '#projects' },
-    { name: 'experience', href: '#experience' },
-    { name: 'about', href: '#education' },
-    { name: 'contact', href: '#contact' },
+    { name: 'Work',       href: '#work' },
+    { name: 'Experience', href: '#experience' },
+    { name: 'About',      href: '#about' },
+    { name: 'Contact',    href: '#contact' },
   ];
 
+  const SunIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2m-7.07-14.07 1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+  );
+
+  const MoonIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+    </svg>
+  );
+
   return (
-    <motion.nav
-      initial={{ backgroundColor: 'rgba(255, 255, 255, 0)', borderBottomColor: 'rgba(0, 0, 0, 0)' }}
-      animate={{ 
-        backgroundColor: scrolled ? 'var(--color-nav)' : 'rgba(255, 255, 255, 0)',
-        borderBottomColor: scrolled ? 'var(--color-borderCustom)' : 'rgba(0, 0, 0, 0)',
-        backdropFilter: scrolled ? 'blur(12px)' : 'blur(0px)'
-      }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center h-[52px] border-b-[0.5px] px-4 md:px-8 xl:px-0`}
-    >
-      <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between">
-        <Link href="#top" className="text-[18px] font-medium tracking-tight hover:opacity-80 transition-opacity focus-ring rounded-micro">
-          nikhil.
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden sm:flex items-center space-x-6 text-bodySm">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href}
-              className="text-textSecondary hover:text-textPrimary transition-colors focus-ring rounded-micro"
-            >
-              {link.name}
-            </Link>
-          ))}
-          
-          <button 
-            onClick={toggleTheme} 
-            className="w-11 h-11 flex items-center justify-center text-textSecondary hover:text-textPrimary transition-colors focus-ring rounded-micro"
-            aria-label="Toggle dark mode"
+    <>
+      {/* Nav bar — CSS-only transitions, no framer-motion in critical path */}
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 flex items-center h-[52px] border-b-[0.5px] px-4 md:px-8 xl:px-0 transition-all duration-200 ease-out"
+        style={{
+          backgroundColor: scrolled ? 'var(--color-nav)' : 'transparent',
+          borderBottomColor: scrolled ? 'var(--color-borderCustom)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(14px)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'blur(14px)' : 'none',
+        }}
+      >
+        <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            href="#hero"
+            className="text-[18px] font-semibold tracking-tight hover:opacity-75 transition-opacity focus-ring rounded-micro"
           >
-            <motion.div
-              initial={false}
-              animate={{ rotate: isDark ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {isDark ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-              )}
-            </motion.div>
-          </button>
+            Nikhil.
+          </Link>
 
-          <a 
-            href="/resume.pdf" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center text-bodySm font-medium text-textPrimary hover:opacity-70 transition-opacity focus-ring rounded-micro ml-2"
-          >
-            résumé <svg className="ml-1 w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-          </a>
+          {/* Desktop nav */}
+          <div className="hidden sm:flex items-center gap-1 text-bodySm">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="px-3 py-2 text-textSecondary hover:text-textPrimary transition-colors focus-ring rounded-micro"
+              >
+                {link.name}
+              </Link>
+            ))}
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="w-11 h-11 flex items-center justify-center text-textSecondary hover:text-textPrimary transition-colors focus-ring rounded-micro ml-1"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <MoonIcon /> : <SunIcon />}
+            </button>
+
+            {/* Résumé CTA */}
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 inline-flex items-center gap-1 px-3.5 py-1.5 bg-primary text-white dark:text-[#111111] text-bodySm font-semibold rounded-btn hover:opacity-85 active:scale-[0.97] transition-all focus-ring"
+            >
+              Résumé
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+              </svg>
+            </a>
+          </div>
+
+          {/* Mobile controls */}
+          <div className="flex sm:hidden items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="w-11 h-11 flex items-center justify-center text-textSecondary focus-ring rounded-micro"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <MoonIcon /> : <SunIcon />}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="w-11 h-11 flex items-center justify-center text-textPrimary focus-ring rounded-micro"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {mobileMenuOpen ? (
+                  <><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>
+                ) : (
+                  <><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></>
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
+      </nav>
 
-        {/* Mobile Hamburger */}
-        <div className="flex sm:hidden items-center space-x-4">
-          <button 
-            onClick={toggleTheme} 
-            className="w-11 h-11 flex items-center justify-center text-textSecondary focus-ring rounded-micro"
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-            )}
-          </button>
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-11 h-11 flex items-center justify-center focus-ring rounded-micro"
-            aria-label="Toggle menu"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-main pt-16 px-4 flex flex-col sm:hidden">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-4 text-h2 font-medium border-b border-custom text-textPrimary"
-            >
-              {link.name}
-            </Link>
-          ))}
-          <a 
-            href="/resume.pdf" 
-            target="_blank" 
-            rel="noopener noreferrer"
+      {/* Mobile overlay — CSS transition only */}
+      <div
+        id="mobile-nav"
+        className="fixed inset-0 z-40 bg-main pt-16 px-6 flex flex-col sm:hidden transition-opacity duration-200 ease-out"
+        style={{
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? 'auto' : 'none',
+        }}
+        aria-hidden={!mobileMenuOpen}
+      >
+        {navLinks.map((link) => (
+          <Link
+            key={link.name}
+            href={link.href}
             onClick={() => setMobileMenuOpen(false)}
-            className="py-4 text-h2 font-medium flex items-center text-textPrimary"
+            className="block py-4 text-[28px] font-semibold border-b border-[var(--color-borderCustom)] text-textPrimary hover:text-primary transition-colors"
+            tabIndex={mobileMenuOpen ? 0 : -1}
           >
-            résumé <svg className="ml-2 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
-          </a>
-        </div>
-      )}
-    </motion.nav>
+            {link.name}
+          </Link>
+        ))}
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setMobileMenuOpen(false)}
+          className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white dark:text-[#111111] text-body font-semibold rounded-btn self-start"
+          tabIndex={mobileMenuOpen ? 0 : -1}
+        >
+          Résumé
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+          </svg>
+        </a>
+      </div>
+    </>
   );
 }
