@@ -196,7 +196,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
             }}
           />
         </div>
-        <span style={{ fontSize: 10, letterSpacing: '0.15em', color: 'rgba(176,73,31,0.6)', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 10, letterSpacing: '0.15em', color: 'rgba(176,73,31,0.6)', textTransform: 'uppercase', marginRight: '-0.15em' }}>
           scroll
         </span>
       </div>
