@@ -8,32 +8,29 @@ export default function LiveStatsTicker() {
     'TensorFlow',
   ];
 
-  // We duplicate the array to allow seamless infinite scrolling
-  const tickerItems = [...stats, ...stats, ...stats, ...stats];
+  // Render original stats array exactly twice to allow 50% translation for a seamless loop.
+  // By rendering the exact same sequence twice, when we translate -50%, it seamlessly jumps back.
+  const half = stats.concat(stats).concat(stats); // ensure it's wide enough for ultra-wide screens
 
   return (
-    <div className="w-full overflow-hidden border-y border-[var(--color-borderCustom)] bg-main/80 dark:bg-surface/80 backdrop-blur-md py-2 relative z-20">
-      <div className="flex w-[200%] animate-marquee">
-        <div className="flex w-1/2 justify-around items-center">
-          {tickerItems.slice(0, tickerItems.length / 2).map((stat, i) => (
-            <div key={i} className="flex items-center gap-6 whitespace-nowrap px-4">
-              <span className="text-micro font-semibold text-textSecondary uppercase tracking-widest">
-                {stat}
-              </span>
-              <span className="text-primary/40">·</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex w-1/2 justify-around items-center">
-          {tickerItems.slice(tickerItems.length / 2).map((stat, i) => (
-            <div key={i} className="flex items-center gap-6 whitespace-nowrap px-4">
-              <span className="text-micro font-semibold text-textSecondary uppercase tracking-widest">
-                {stat}
-              </span>
-              <span className="text-primary/40">·</span>
-            </div>
-          ))}
-        </div>
+    <div className="w-full overflow-hidden border-y border-[var(--color-borderCustom)] bg-main/80 dark:bg-surface/80 backdrop-blur-md py-2.5 relative z-20 flex">
+      <div className="flex animate-marquee min-w-max">
+        {half.map((stat, i) => (
+          <div key={i} className="flex items-center gap-6 whitespace-nowrap px-6">
+            <span className="text-micro font-semibold text-textSecondary uppercase tracking-widest">
+              {stat}
+            </span>
+            <span className="text-primary/40">·</span>
+          </div>
+        ))}
+        {half.map((stat, i) => (
+          <div key={`dup-${i}`} className="flex items-center gap-6 whitespace-nowrap px-6">
+            <span className="text-micro font-semibold text-textSecondary uppercase tracking-widest">
+              {stat}
+            </span>
+            <span className="text-primary/40">·</span>
+          </div>
+        ))}
       </div>
     </div>
   );

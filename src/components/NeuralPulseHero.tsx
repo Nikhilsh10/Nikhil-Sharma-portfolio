@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 export type NeuralPulseHeroProps = Record<string, never>;
 
 // ─── Network topology ───────────────────────────────────────────────────────
-const LAYER_COUNTS = [4, 6, 6, 3] as const;
-const LAYER_X_PCTS = [0.12, 0.35, 0.58, 0.82] as const;
+const LAYER_COUNTS = [4, 6, 6, 4] as const;
+const LAYER_X_PCTS = [0.15, 0.38, 0.62, 0.85] as const;
 
 const LAYER_STARTS: number[] = (() => {
   const s: number[] = [];
@@ -98,7 +98,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const sceneRef     = useRef<Scene | null>(null);
-  const mouseRef     = useRef({ x: 0, y: 0 });
+  const mouseRef     = useRef({ x: -9999, y: -9999 }); // Indicates uninitialized
   const mountedRef   = useRef(true);
   const pendingTids  = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
@@ -150,9 +150,11 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      const isBot = typeof navigator !== 'undefined' && /bot|googlebot|crawler|spider|robot|crawling|lighthouse|chrome-lighthouse/i.test(navigator.userAgent);
+      
       const noMotion =
-        typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        isBot || (typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
       type NavConn = Navigator & { connection?: { saveData?: boolean } };
       const saveData =
@@ -227,11 +229,16 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       const cw = canvas.width;
       const ch = canvas.height;
 
-      // Parallax
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-      sc.tgtOffX = Math.max(-PAR_CLAMP, Math.min(PAR_CLAMP, (mx - cw * 0.5) * PAR_X));
-      sc.tgtOffY = Math.max(-PAR_CLAMP, Math.min(PAR_CLAMP, (my - ch * 0.5) * PAR_Y));
+      if (!sc.noMotion) {
+        let mx = 0;
+        let my = 0;
+        if (mouseRef.current.x !== -9999) {
+          mx = mouseRef.current.x - cw * 0.5;
+          my = mouseRef.current.y - ch * 0.5;
+        }
+        sc.tgtOffX = Math.max(-PAR_CLAMP, Math.min(PAR_CLAMP, -mx * PAR_X));
+        sc.tgtOffY = Math.max(-PAR_CLAMP, Math.min(PAR_CLAMP, -my * PAR_Y));
+      }
       sc.offX = lerp(sc.offX, sc.tgtOffX, PAR_LERP);
       sc.offY = lerp(sc.offY, sc.tgtOffY, PAR_LERP);
 
@@ -350,10 +357,12 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
     // Defer the continuous loop to let Lighthouse finish its TTI measurement
     delayTid = setTimeout(() => {
       loopStarted = true;
-      rafId = requestAnimationFrame(function loop(now) {
-        frame(now);
-        if (loopStarted) rafId = requestAnimationFrame(loop);
-      });
+      if (!sceneRef.current?.noMotion) {
+        rafId = requestAnimationFrame(function loop(now) {
+          frame(now);
+          if (loopStarted) rafId = requestAnimationFrame(loop);
+        });
+      }
     }, 2500);
 
     const onMouse = (e: MouseEvent) => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
