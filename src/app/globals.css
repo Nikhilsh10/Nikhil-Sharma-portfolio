@@ -22,7 +22,7 @@
   /* === TYPOGRAPHY === */
   --font-sans: "Inter", sans-serif;
 
-  /* Hero headline — clamp(2.75rem, 5vw, 3.5rem) via CSS directly */
+  /* Hero headline */
   --text-display: 3rem;
   --text-h1: 22px;
   --text-h2: 18px;
@@ -45,7 +45,6 @@
 }
 
 @layer base {
-  /* === DARK MODE TOKENS === */
   .dark {
     --color-primary: #E8915F;
     --color-success: #5DCAA5;
@@ -60,87 +59,81 @@
     --color-borderCustom: rgba(255, 255, 255, 0.12);
     --color-borderHover: rgba(255, 255, 255, 0.22);
 
-    /* True graphite — NOT navy-tinted */
+    /* True graphite */
     --color-main: #121212;
     --color-nav: rgba(18, 18, 18, 0.88);
   }
 
-  html {
-    scroll-behavior: smooth;
-    background-color: var(--color-main);
-    color: var(--color-textPrimary);
-  }
-
-  body {
-    line-height: 1.65;
+  ::selection {
+    background: var(--color-primary);
+    color: white;
   }
 }
 
 @layer utilities {
-  /* Focus ring — accessible keyboard navigation */
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-main;
   }
 
-  /* Hide scrollbar utility (replaces style jsx in TechStackStrip) */
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
 /* === HERO ANIMATIONS === */
-
-/* Radial glow breathing — HeroFallback (respects reduced motion) */
 @keyframes hero-glow-breathe {
-  0%, 100% {
-    opacity: 0.55;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.95;
-    transform: scale(1.12);
-  }
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.12); }
 }
-
-/* Availability badge pulse */
-@keyframes status-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-
+@keyframes status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero-glow-anim {
-    animation: none !important;
-  }
-  .status-pulse-anim {
-    animation: none !important;
-  }
+  .hero-glow-anim { animation: none !important; }
+  .status-pulse-anim { animation: none !important; }
 }
-
 /* Infinite Marquee Animation */
-@keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+@keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 50s linear infinite; will-change: transform; }
+.animate-marquee:hover, .animate-marquee:focus-within { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none !important; transform: none !important; }
 }
 
-.animate-marquee {
-  animation: marquee 50s linear infinite;
-  /* Will-change hints the browser to optimize this transform layer */
-  will-change: transform;
+/* Full-page ambient gradient */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.animate-marquee:hover,
-.animate-marquee:focus-within {
-  animation-play-state: paused;
+/* Orb animations */
+@keyframes orb-float-1 {
+  0%,100% { transform: translate(0px,0px) scale(1); }
+  33% { transform: translate(30px,-20px) scale(1.05); }
+  66% { transform: translate(-20px,15px) scale(0.97); }
 }
+@keyframes orb-float-2 {
+  0%,100% { transform: translate(0px,0px) scale(1); }
+  33% { transform: translate(-25px,20px) scale(1.03); }
+  66% { transform: translate(20px,-15px) scale(0.98); }
+}
+@keyframes orb-float-3 {
+  0%,100% { transform: translate(0px,0px) scale(1); }
+  50% { transform: translate(15px,25px) scale(1.04); }
+}
+
+/* Page background utility */
+.page-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
+  background-size: 600% 600%;
+  animation: gradient-shift 12s ease infinite;
+}
+
+/* Orb classes */
+.orb-1 { animation: orb-float-1 18s ease-in-out infinite; }
+.orb-2 { animation: orb-float-2 22s ease-in-out infinite; }
+.orb-3 { animation: orb-float-3 14s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none !important;
-    transform: none !important;
-  }
+  .orb-1, .orb-2, .orb-3 { animation: none !important; }
 }

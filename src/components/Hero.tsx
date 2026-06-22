@@ -64,7 +64,7 @@ export default function Hero() {
             style={{ animation: 'status-pulse 2.2s ease-in-out infinite' }}
           />
           <span className="text-micro font-medium text-textSecondary uppercase tracking-widest">
-            Open to AI/ML internship &amp; entry-level roles · Vadodara / remote
+            Open to AI/ML internship &amp; entry-level roles · remote / India
           </span>
         </div>
 
