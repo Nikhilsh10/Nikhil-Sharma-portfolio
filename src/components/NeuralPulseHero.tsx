@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 
 export type NeuralPulseHeroProps = Record<string, never>;
 
@@ -9,7 +8,6 @@ export type NeuralPulseHeroProps = Record<string, never>;
 const LAYER_COUNTS = [4, 6, 6, 3] as const;
 const LAYER_X_PCTS = [0.12, 0.35, 0.58, 0.82] as const;
 
-// Precomputed layer start indices into the flat nodes array
 const LAYER_STARTS: number[] = (() => {
   const s: number[] = [];
   let acc = 0;
@@ -18,81 +16,61 @@ const LAYER_STARTS: number[] = (() => {
 })();
 
 // ─── Visual constants ───────────────────────────────────────────────────────
-const NODE_R_BASE       = 5;
-const NODE_R_PEAK       = 8;
-const NODE_GLOW_MULT    = 2.5;
-const PULSE_MS          = 300;
-const SIG_DUR_MIN       = 600;
-const SIG_DUR_MAX       = 900;
-const ROOT_INTERVAL_MS  = 1200;
-const MAX_SIGNALS       = 40;
-const PAR_X             = 0.018;
-const PAR_Y             = 0.012;
-const PAR_CLAMP         = 30;
-const PAR_LERP          = 0.06;
-const R_LERP            = 0.15;
+const NODE_R_BASE      = 5;
+const NODE_R_PEAK      = 8;
+const NODE_GLOW_MULT   = 2.5;
+const PULSE_MS         = 300;
+const SIG_DUR_MIN      = 600;
+const SIG_DUR_MAX      = 900;
+const ROOT_INTERVAL_MS = 1200;
+const MAX_SIGNALS      = 40;
+const PAR_X            = 0.018;
+const PAR_Y            = 0.012;
+const PAR_CLAMP        = 30;
+const PAR_LERP         = 0.06;
+const R_LERP           = 0.15;
 
 const ROLES = ['ML Engineer', 'Data Analyst', 'Python Developer', 'AI Builder'] as const;
 
-// ─── Scene types ────────────────────────────────────────────────────────────
+// ─── Scene types ─────────────────────────────────────────────────────────
 interface NodeData {
   x: number; y: number;
   radius: number; targetRadius: number; baseRadius: number;
   pulseTimer: number;
 }
-
 interface EdgeData {
   fromIdx: number; toIdx: number;
-  brightness: number; // 0‥1 drives color lerp
+  brightness: number;
 }
-
 interface SignalData {
-  id: number;
-  edgeIdx: number;
-  progress: number;    // 0‥1
-  invDur: number;      // 1/durationMs — avoids division each frame
+  id: number; edgeIdx: number;
+  progress: number; invDur: number;
 }
-
 interface Scene {
-  nodes: NodeData[];
-  edges: EdgeData[];
-  signals: SignalData[];
-  sigId: number;
-  lastRoot: number;
-  rootInterval: number;
-  offX: number; offY: number;
-  tgtOffX: number; tgtOffY: number;
-  prevTime: number;
-  noMotion: boolean;
+  nodes: NodeData[]; edges: EdgeData[]; signals: SignalData[];
+  sigId: number; lastRoot: number; rootInterval: number;
+  offX: number; offY: number; tgtOffX: number; tgtOffY: number;
+  prevTime: number; noMotion: boolean;
 }
 
-// ─── Pure helpers ───────────────────────────────────────────────────────────
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
-}
+// ─── Pure helpers ─────────────────────────────────────────────────────────
+function lerp(a: number, b: number, t: number): number { return a + (b - a) * t; }
 
 function edgeColor(b: number): string {
-  // Lerp rgba(99,102,241, 0.08) → rgba(167,139,250, 0.55)
-  const r = (99  + 68  * b) | 0;
-  const g = (102 + 37  * b) | 0;
-  const bl= (241 + 9   * b) | 0;
-  const a = (0.08 + 0.47 * b).toFixed(3);
-  return `rgba(${r},${g},${bl},${a})`;
+  const r = (99  + 68 * b) | 0;
+  const g = (102 + 37 * b) | 0;
+  const bl= (241 +  9 * b) | 0;
+  return `rgba(${r},${g},${bl},${(0.08 + 0.47 * b).toFixed(3)})`;
 }
 
-// ─── Graph builders ─────────────────────────────────────────────────────────
 function buildNodes(w: number, h: number): NodeData[] {
   const nodes: NodeData[] = [];
   LAYER_COUNTS.forEach((count, li) => {
-    const x = w * LAYER_X_PCTS[li];
+    const x       = w * LAYER_X_PCTS[li];
     const spacing = Math.min(h * 0.14, 80);
-    const startY = h * 0.5 - ((count - 1) * spacing) * 0.5;
+    const startY  = h * 0.5 - (count - 1) * spacing * 0.5;
     for (let i = 0; i < count; i++) {
-      nodes.push({
-        x, y: startY + i * spacing,
-        radius: NODE_R_BASE, targetRadius: NODE_R_BASE, baseRadius: NODE_R_BASE,
-        pulseTimer: 0,
-      });
+      nodes.push({ x, y: startY + i * spacing, radius: NODE_R_BASE, targetRadius: NODE_R_BASE, baseRadius: NODE_R_BASE, pulseTimer: 0 });
     }
   });
   return nodes;
@@ -101,18 +79,21 @@ function buildNodes(w: number, h: number): NodeData[] {
 function buildEdges(nodes: NodeData[]): EdgeData[] {
   const edges: EdgeData[] = [];
   for (let li = 0; li < LAYER_COUNTS.length - 1; li++) {
-    const fStart = LAYER_STARTS[li];
-    const tStart = LAYER_STARTS[li + 1];
     for (let fi = 0; fi < LAYER_COUNTS[li]; fi++) {
       for (let ti = 0; ti < LAYER_COUNTS[li + 1]; ti++) {
-        edges.push({ fromIdx: fStart + fi, toIdx: tStart + ti, brightness: 0 });
+        edges.push({ fromIdx: LAYER_STARTS[li] + fi, toIdx: LAYER_STARTS[li + 1] + ti, brightness: 0 });
       }
     }
   }
   return edges;
 }
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// ─── Shared CSS animation string builder ──────────────────────────────────
+const fadeUp = (delay: number): React.CSSProperties => ({
+  animation: `nph-fade-up 0.6s ease ${delay}s both`,
+});
+
+// ─── Component ───────────────────────────────────────────────────────────
 export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
@@ -124,12 +105,11 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
   const [displayed, setDisplayed] = useState('');
   const [cursorOn,  setCursorOn]  = useState(true);
 
-  // ── Typewriter (pure React state + setInterval/setTimeout) ─────────────
+  // ── Typewriter ────────────────────────────────────────────────────────
   useEffect(() => {
     let ri = 0, ci = 0;
     let phase: 'type' | 'pause' | 'delete' = 'type';
     let tid: ReturnType<typeof setTimeout>;
-
     const tick = () => {
       const word = ROLES[ri];
       if (phase === 'type') {
@@ -138,8 +118,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         if (ci >= word.length) { phase = 'pause'; tid = setTimeout(tick, 1800); return; }
         tid = setTimeout(tick, 75 + Math.random() * 45);
       } else if (phase === 'pause') {
-        phase = 'delete';
-        tid = setTimeout(tick, 50);
+        phase = 'delete'; tid = setTimeout(tick, 50);
       } else {
         ci--;
         setDisplayed(word.slice(0, ci));
@@ -151,13 +130,13 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
     return () => clearTimeout(tid);
   }, []);
 
-  // ── Cursor blink ─────────────────────────────────────────────────────────
+  // ── Cursor blink ──────────────────────────────────────────────────────
   useEffect(() => {
     const id = setInterval(() => setCursorOn(v => !v), 530);
     return () => clearInterval(id);
   }, []);
 
-  // ── Canvas animation ─────────────────────────────────────────────────────
+  // ── Canvas animation ──────────────────────────────────────────────────
   useEffect(() => {
     mountedRef.current = true;
     const container = containerRef.current;
@@ -177,16 +156,6 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
 
     const rootInterval = saveData ? 3000 : ROOT_INTERVAL_MS;
 
-    // Build / rebuild scene when dimensions change
-    const initScene = (w: number, h: number): Scene => ({
-      nodes: buildNodes(w, h),
-      edges: buildEdges(buildNodes(w, h)),   // edges reference the SAME nodes built above
-      signals: [], sigId: 0,
-      lastRoot: 0, rootInterval,
-      offX: 0, offY: 0, tgtOffX: 0, tgtOffY: 0,
-      prevTime: performance.now(), noMotion,
-    });
-
     const resize = () => {
       const w = container.offsetWidth;
       const h = container.offsetHeight;
@@ -202,13 +171,15 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
     };
 
     resize();
-    const s = initScene(canvas.width, canvas.height);
-    // rebuild with the same nodes so edges point to the right objects
-    s.nodes = buildNodes(canvas.width, canvas.height);
-    s.edges = buildEdges(s.nodes);
-    sceneRef.current = s;
 
-    // ── Signal helpers ──────────────────────────────────────────────────
+    const initNodes = buildNodes(canvas.width, canvas.height);
+    sceneRef.current = {
+      nodes: initNodes, edges: buildEdges(initNodes), signals: [], sigId: 0,
+      lastRoot: 0, rootInterval,
+      offX: 0, offY: 0, tgtOffX: 0, tgtOffY: 0,
+      prevTime: performance.now(), noMotion,
+    };
+
     const addSignal = (sc: Scene, edgeIdx: number) => {
       if (sc.signals.length >= MAX_SIGNALS) return;
       const dur = SIG_DUR_MIN + Math.random() * (SIG_DUR_MAX - SIG_DUR_MIN);
@@ -227,12 +198,8 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       const node = sc.nodes[nodeIdx];
       node.targetRadius = NODE_R_PEAK;
       node.pulseTimer   = PULSE_MS;
-
-      // Collect outgoing edges for this node
       const out: number[] = [];
       sc.edges.forEach((e, i) => { if (e.fromIdx === nodeIdx) out.push(i); });
-
-      // Stagger child signals: 40–80ms between each
       out.forEach((edgeIdx, si) => {
         const delay = 40 + si * (40 + Math.random() * 40);
         const tid = setTimeout(() => {
@@ -244,15 +211,13 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       });
     };
 
-    // ── RAF loop ────────────────────────────────────────────────────────
     let rafId = 0;
-
     const frame = (now: number) => {
       rafId = requestAnimationFrame(frame);
       const sc = sceneRef.current;
       if (!sc) return;
 
-      const dt  = Math.min(now - sc.prevTime, 50);
+      const dt = Math.min(now - sc.prevTime, 50);
       sc.prevTime = now;
 
       const cw = canvas.width;
@@ -270,10 +235,9 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       ctx.save();
       ctx.translate(sc.offX, sc.offY);
 
-      // Reset edge brightness each frame
       for (const e of sc.edges) e.brightness = 0;
 
-      // Advance signals; collect those that arrived
+      // Advance signals
       const dead: number[] = [];
       for (let i = 0; i < sc.signals.length; i++) {
         const sig = sc.signals[i];
@@ -283,7 +247,6 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
           const e = sc.edges[sig.edgeIdx];
           if (e && !sc.noMotion) fireNode(sc, e.toIdx);
         } else {
-          // Edge brightens as signal nears mid-point
           const proximity = 1 - Math.abs(sig.progress - 0.5) * 2;
           const e = sc.edges[sig.edgeIdx];
           if (e) e.brightness = Math.max(e.brightness, proximity);
@@ -291,7 +254,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       }
       for (let i = dead.length - 1; i >= 0; i--) sc.signals.splice(dead[i], 1);
 
-      // Lerp node radii; expire pulse timers
+      // Update nodes
       for (const node of sc.nodes) {
         if (node.pulseTimer > 0) {
           node.pulseTimer -= dt;
@@ -305,14 +268,13 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         const f = sc.nodes[e.fromIdx];
         const t = sc.nodes[e.toIdx];
         ctx.beginPath();
-        ctx.moveTo(f.x, f.y);
-        ctx.lineTo(t.x, t.y);
+        ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
         ctx.strokeStyle = edgeColor(e.brightness);
         ctx.lineWidth   = 0.7;
         ctx.stroke();
       }
 
-      // Draw travelling signals
+      // Draw signals
       for (const sig of sc.signals) {
         const e = sc.edges[sig.edgeIdx];
         if (!e) continue;
@@ -324,7 +286,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         ctx.fill();
       }
 
-      // Draw nodes (glow → fill → stroke, back‑to‑front)
+      // Draw nodes (glow → fill → stroke)
       for (const node of sc.nodes) {
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius * NODE_GLOW_MULT, 0, Math.PI * 2);
@@ -342,7 +304,6 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
 
       ctx.restore();
 
-      // Spawn new root signal at interval
       if (!sc.noMotion && now - sc.lastRoot >= sc.rootInterval) {
         sc.lastRoot = now;
         spawnRoot(sc);
@@ -362,98 +323,73 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       cancelAnimationFrame(rafId);
       ro.disconnect();
       document.removeEventListener('mousemove', onMouse);
-      // Cancel any in-flight stagger timeouts
       pendingTids.current.forEach(t => clearTimeout(t));
       pendingTids.current.clear();
     };
   }, []);
 
-  // ─── Render ──────────────────────────────────────────────────────────────
+  // ─── Render ──────────────────────────────────────────────────────────
   return (
     <section
       className="relative w-full overflow-hidden"
       style={{ minHeight: '100svh', background: '#0a0a14' }}
     >
-      {/* Canvas — fills section absolutely */}
+      {/* Canvas */}
       <div ref={containerRef} className="absolute inset-0">
         <canvas ref={canvasRef} aria-hidden="true" className="block w-full h-full" />
       </div>
 
-      {/* Text overlay — centered, pointer-events disabled except CTAs */}
+      {/* Text overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none px-4">
 
         {/* Eyebrow badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-6"
-          style={{
+        <div style={{ ...fadeUp(0.1), marginBottom: '1.5rem' }}>
+          <div style={{
             border: '1px solid rgba(139,92,246,0.4)',
             background: 'rgba(99,102,241,0.1)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             borderRadius: '999px',
             padding: '6px 18px',
+          }}>
+            <span style={{ fontSize: 12, letterSpacing: '0.12em', color: 'rgba(167,139,250,0.9)' }}>
+              Machine Learning · Data · AI
+            </span>
+          </div>
+        </div>
+
+        {/* Name — nph-slide-up so element is partially visible immediately (LCP) */}
+        <h1
+          className="text-center"
+          style={{
+            fontSize: 'clamp(2.4rem, 5vw, 4.5rem)',
+            fontWeight: 600,
+            color: '#f5f5ff',
+            lineHeight: 1.1,
+            marginBottom: '0.75rem',
+            animation: 'nph-slide-up 0.5s ease 0.2s both',
           }}
         >
-          <span style={{ fontSize: 12, letterSpacing: '0.12em', color: 'rgba(167,139,250,0.9)' }}>
-            Machine Learning · Data · AI
-          </span>
-        </motion.div>
-
-        {/* Name */}
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="text-center mb-3"
-          style={{ fontSize: 'clamp(2.4rem, 5vw, 4.5rem)', fontWeight: 600, color: '#f5f5ff', lineHeight: 1.1 }}
-        >
           Nikhil Sharma
-        </motion.h1>
+        </h1>
 
-        {/* Typewriter role line */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-4 text-center"
-          style={{ fontSize: '1.25rem', fontWeight: 400 }}
-        >
+        {/* Typewriter */}
+        <div style={{ ...fadeUp(0.4), fontSize: '1.25rem', fontWeight: 400, marginBottom: '1rem', textAlign: 'center' }}>
           <span style={{ color: 'rgba(200,200,220,0.5)' }}>I build as a </span>
           <span style={{ color: 'rgba(167,139,250,0.85)' }}>{displayed}</span>
           <span
             aria-hidden="true"
-            style={{
-              color: 'rgba(167,139,250,0.85)',
-              display: 'inline-block',
-              width: 2,
-              opacity: cursorOn ? 1 : 0,
-              transition: 'opacity 80ms',
-            }}
+            style={{ color: 'rgba(167,139,250,0.85)', display: 'inline-block', width: 2, opacity: cursorOn ? 1 : 0, transition: 'opacity 80ms' }}
           >|</span>
-        </motion.div>
+        </div>
 
         {/* Bio */}
-        <motion.p
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
-          className="text-center mb-8"
-          style={{ fontSize: 15, color: 'rgba(180,180,210,0.55)', maxWidth: 480, lineHeight: 1.7 }}
-        >
+        <p style={{ ...fadeUp(0.55), fontSize: 15, color: 'rgba(180,180,210,0.55)', maxWidth: 480, lineHeight: 1.7, textAlign: 'center', marginBottom: '2rem' }}>
           Turning raw data into decisions. Neural nets to dashboards.
-        </motion.p>
+        </p>
 
-        {/* CTA buttons — re-enable pointer events only here */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="flex pointer-events-auto"
-          style={{ gap: 12 }}
-        >
+        {/* CTAs */}
+        <div style={{ ...fadeUp(0.7), display: 'flex', gap: 12, pointerEvents: 'auto' }}>
           <a
             href="#work"
             style={{
@@ -469,18 +405,11 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               display: 'inline-block',
               transition: 'background 200ms, transform 200ms',
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(139,92,246,0.9)';
-              e.currentTarget.style.transform  = 'scale(1.03)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(99,102,241,0.85)';
-              e.currentTarget.style.transform  = 'scale(1)';
-            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.9)'; e.currentTarget.style.transform = 'scale(1.03)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.85)'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             View Projects
           </a>
-
           <a
             href="/resume.pdf"
             download
@@ -498,40 +427,32 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               display: 'inline-block',
               transition: 'background 200ms, border-color 200ms',
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background    = 'rgba(99,102,241,0.12)';
-              e.currentTarget.style.borderColor   = 'rgba(139,92,246,0.8)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background    = 'transparent';
-              e.currentTarget.style.borderColor   = 'rgba(139,92,246,0.45)';
-            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.8)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.45)'; }}
           >
             Download CV
           </a>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Scroll indicator — absolute bottom-center */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.9 }}
+      {/* Scroll indicator */}
+      <div
         aria-hidden="true"
-        className="absolute left-1/2 z-10"
-        style={{ bottom: '2rem', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+        style={{
+          ...fadeUp(0.9),
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8,
+          zIndex: 10,
+        }}
       >
-        <div
-          style={{
-            position: 'relative',
-            width: 2,
-            height: 36,
-            background: 'rgba(139,92,246,0.4)',
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
-          <motion.div
+        <div style={{ position: 'relative', width: 2, height: 36, background: 'rgba(139,92,246,0.4)', borderRadius: 1, overflow: 'hidden' }}>
+          <div
             style={{
               position: 'absolute',
               left: '50%',
@@ -540,15 +461,14 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               height: 5,
               borderRadius: '50%',
               background: 'rgba(139,92,246,0.8)',
+              animation: 'nph-scroll-dot 1.4s ease-in-out infinite',
             }}
-            animate={{ top: ['0px', '31px'] }}
-            transition={{ duration: 1.4, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
           />
         </div>
         <span style={{ fontSize: 10, letterSpacing: '0.15em', color: 'rgba(139,92,246,0.5)', textTransform: 'uppercase' }}>
           scroll
         </span>
-      </motion.div>
+      </div>
     </section>
   );
 }

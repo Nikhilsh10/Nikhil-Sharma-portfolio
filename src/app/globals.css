@@ -205,3 +205,25 @@
 @media (prefers-reduced-motion: reduce) {
   .orb-1, .orb-2, .orb-3 { animation: none !important; }
 }
+
+/* ── NeuralPulseHero animations ── */
+@keyframes nph-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Slide-in only (no opacity) — keeps h1 in LCP paint immediately */
+@keyframes nph-slide-up {
+  from { transform: translateY(20px); opacity: 0.7; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+
+@keyframes nph-scroll-dot {
+  0%   { top: 0px;  }
+  80%  { top: 31px; }
+  100% { top: 31px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class^="nph-"] { animation: none !important; opacity: 1 !important; }
+}
