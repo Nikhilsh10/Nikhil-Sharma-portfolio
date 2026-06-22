@@ -1,5 +1,5 @@
 import NavBar from '@/components/NavBar';
-import Hero from '@/components/Hero';
+import NeuralPulseHero from '@/components/NeuralPulseHero';
 import TechStackStrip from '@/components/TechStackStrip';
 import ProjectCard, { ProjectData } from '@/components/ProjectCard';
 import ExperienceTimeline from '@/components/ExperienceTimeline';
@@ -69,7 +69,7 @@ export default function Home() {
       <NavBar />
       <main className="flex flex-col min-h-screen">
         {/* ── Hero ── */}
-        <Hero />
+        <NeuralPulseHero />
 
         {/* ── Tech Stack Strip ── */}
         <TechStackStrip />
