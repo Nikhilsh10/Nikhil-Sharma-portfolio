@@ -267,44 +267,71 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         node.radius = lerp(node.radius, node.targetRadius, R_LERP);
       }
 
-      // Draw edges
+      // Batch draw all idle edges
+      ctx.beginPath();
       for (const e of sc.edges) {
-        const f = sc.nodes[e.fromIdx];
-        const t = sc.nodes[e.toIdx];
-        ctx.beginPath();
-        ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
-        ctx.strokeStyle = edgeColor(e.brightness);
-        ctx.lineWidth   = 0.7;
-        ctx.stroke();
+        if (e.brightness === 0) {
+          const f = sc.nodes[e.fromIdx];
+          const t = sc.nodes[e.toIdx];
+          ctx.moveTo(f.x, f.y);
+          ctx.lineTo(t.x, t.y);
+        }
+      }
+      ctx.strokeStyle = edgeColor(0);
+      ctx.lineWidth   = 0.7;
+      ctx.stroke();
+
+      // Draw active edges individually
+      for (const e of sc.edges) {
+        if (e.brightness > 0) {
+          const f = sc.nodes[e.fromIdx];
+          const t = sc.nodes[e.toIdx];
+          ctx.beginPath();
+          ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
+          ctx.strokeStyle = edgeColor(e.brightness);
+          ctx.lineWidth   = 0.7;
+          ctx.stroke();
+        }
       }
 
       // Draw signals
+      ctx.beginPath();
       for (const sig of sc.signals) {
         const e = sc.edges[sig.edgeIdx];
         if (!e) continue;
         const f = sc.nodes[e.fromIdx];
         const t = sc.nodes[e.toIdx];
-        ctx.beginPath();
-        ctx.arc(lerp(f.x, t.x, sig.progress), lerp(f.y, t.y, sig.progress), 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(176,73,31,0.95)';
-        ctx.fill();
+        const x = lerp(f.x, t.x, sig.progress);
+        const y = lerp(f.y, t.y, sig.progress);
+        ctx.moveTo(x + 3, y);
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
       }
+      ctx.fillStyle = 'rgba(176,73,31,0.95)';
+      ctx.fill();
 
-      // Draw nodes (glow → fill → stroke)
+      // Batch draw node glows
+      ctx.beginPath();
       for (const node of sc.nodes) {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius * NODE_GLOW_MULT, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(217,123,63,0.15)';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle   = 'rgba(217,123,63,0.25)';
-        ctx.strokeStyle = 'rgba(176,73,31,0.7)';
-        ctx.lineWidth   = 1.2;
-        ctx.fill();
-        ctx.stroke();
+        const r = node.radius * NODE_GLOW_MULT;
+        ctx.moveTo(node.x + r, node.y);
+        ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
       }
+      ctx.fillStyle = 'rgba(217,123,63,0.15)';
+      ctx.fill();
+
+      // Batch draw node fills
+      ctx.beginPath();
+      for (const node of sc.nodes) {
+        ctx.moveTo(node.x + node.radius, node.y);
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+      }
+      ctx.fillStyle   = 'rgba(217,123,63,0.25)';
+      ctx.fill();
+
+      // Batch draw node strokes
+      ctx.strokeStyle = 'rgba(176,73,31,0.7)';
+      ctx.lineWidth   = 1.2;
+      ctx.stroke();
 
       ctx.restore();
 
