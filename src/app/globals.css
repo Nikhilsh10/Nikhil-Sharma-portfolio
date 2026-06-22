@@ -171,11 +171,7 @@
   .hero-glow-anim { animation: none !important; }
   .status-pulse-anim { animation: none !important; }
 }
-/* Infinite Marquee Animation */
-@keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
-.animate-marquee { animation: marquee 50s linear infinite; will-change: transform; }
-.animate-marquee:hover, .animate-marquee:focus-within { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .animate-marquee { animation: none !important; transform: none !important; } }
+
 
 /* Full-page ambient gradient */
 @keyframes gradient-shift {
@@ -230,12 +226,16 @@
 
 /* ── LiveStatsTicker marquee ── */
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% { transform: translateX(0) translateZ(0); }
+  100% { transform: translateX(-50%) translateZ(0); }
 }
 .animate-marquee {
   animation: marquee 35s linear infinite;
+  will-change: transform;
 }
-.animate-marquee:hover {
+.animate-marquee:hover, .animate-marquee:focus-within {
   animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) { 
+  .animate-marquee { animation: none !important; transform: none !important; } 
 }
