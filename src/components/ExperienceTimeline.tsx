@@ -1,10 +1,35 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useReveal } from '@/hooks/useReveal';
+import { useMouseGlow } from '@/hooks/useMouseGlow';
+
+function useScrollProgress() {
+  const [progress, setProgress] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const start = rect.top - windowHeight * 0.6;
+      const height = rect.height;
+      let p = -start / height;
+      p = Math.max(0, Math.min(1, p));
+      setProgress(p);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return { scrollRef: ref, progress };
+}
 
 export default function ExperienceTimeline() {
   const ref = useReveal();
+  const { scrollRef, progress } = useScrollProgress();
 
   const experiences = [
     {
@@ -43,36 +68,65 @@ export default function ExperienceTimeline() {
           </h2>
         </div>
 
-        <div className="relative border-l border-[var(--color-borderCustom)] ml-3 md:ml-4">
-          {experiences.map((exp, index) => (
-            <div key={index} className="mb-12 ml-8 relative group">
-              {/* Timeline dot */}
-              <span className="absolute -left-[41px] top-1.5 w-3 h-3 rounded-full bg-surface border-2 border-primary group-hover:bg-primary transition-colors duration-300" />
+        <div ref={scrollRef} className="relative border-l border-[var(--color-borderCustom)] ml-3 md:ml-4">
+          {/* Animated fill line */}
+          <div 
+            className="absolute left-[-1px] top-0 w-[1px] bg-primary transition-all duration-100 origin-top"
+            style={{ height: `${progress * 100}%` }}
+          />
+          {experiences.map((exp, index) => {
+            const isActive = progress > (index / experiences.length);
+            return (
+              <div key={index} className="mb-12 ml-8 relative group">
+                {/* Timeline dot */}
+                <span className={`absolute -left-[41px] top-1.5 w-3 h-3 rounded-full border-2 transition-colors duration-500 ${isActive ? 'bg-primary border-primary' : 'bg-surface border-[var(--color-borderHover)] group-hover:border-primary'}`} />
 
-              <div className="glass-panel rounded-card p-4">
-                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-2">
-                  <h3 className="text-h3 font-semibold text-textPrimary">
-                    {exp.role}{' '}
-                    <span className="text-textTertiary font-normal">
-                      · {exp.company}
-                    </span>
-                  </h3>
-                  <time className="text-caption text-textSecondary mt-1 sm:mt-0 whitespace-nowrap">
-                    {exp.period}
-                  </time>
-                </div>
-
-                <p
-                  className="text-body text-textSecondary max-w-3xl"
-                  style={{ lineHeight: 1.65 }}
-                >
-                  {exp.description}
-                </p>
+                <ExperienceCard exp={exp} />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
+  );
+}
+
+function ExperienceCard({ exp }: { exp: any }) {
+  const { ref, handleMouseMove } = useMouseGlow();
+  
+  return (
+    <div 
+      ref={ref as any}
+      onMouseMove={handleMouseMove}
+      className="glass-panel rounded-card p-6 relative overflow-hidden group/card"
+    >
+      <div 
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover/card:opacity-100 z-0" 
+        style={{ 
+          background: 'radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(176,73,31,0.08), transparent 40%)' 
+        }} 
+      />
+      
+      <div className="relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-2">
+          <h3 className="text-h3 font-semibold text-textPrimary">
+            {exp.role}{' '}
+            <span className="text-textTertiary font-normal">
+              · {exp.company}
+            </span>
+          </h3>
+          <time className="text-caption text-textSecondary mt-1 sm:mt-0 whitespace-nowrap font-medium tracking-wide">
+            {exp.period}
+          </time>
+        </div>
+
+        <p
+          className="text-body text-textSecondary max-w-3xl"
+          style={{ lineHeight: 1.65 }}
+        >
+          {exp.description}
+        </p>
+      </div>
+    </div>
   );
 }

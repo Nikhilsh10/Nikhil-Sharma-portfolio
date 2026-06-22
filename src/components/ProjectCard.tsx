@@ -2,21 +2,27 @@
 
 import { IconBrandGithub } from '@tabler/icons-react';
 
-export interface ProjectData {
-  title: string;
-  badge: string;
-  description: string;
-  tags: string[];
-  githubUrl: string;
-  featured?: boolean;
-  metrics?: { label: string; value: string }[];
-  accuracy?: number;
-}
+import { ProjectData } from '@/types';
+import { useMouseGlow } from '@/hooks/useMouseGlow';
 
 export default function ProjectCard({ project }: { project: ProjectData }) {
+  const { ref, handleMouseMove } = useMouseGlow();
+
   return (
-    <article className={`group relative flex flex-col justify-between h-full glass-panel rounded-card p-6 hover:-translate-y-1 transition-all duration-300 ease-out border border-[var(--glass-border)] hover:border-primary/50 hover:shadow-[0_0_24px_rgba(176,73,31,0.15)] ${project.featured ? ' featured-card-glow' : ''}`}>
-      <div>
+    <article 
+      ref={ref as any}
+      onMouseMove={handleMouseMove}
+      className={`group relative flex flex-col justify-between h-full glass-panel rounded-card p-6 hover:-translate-y-1 transition-all duration-300 ease-out border border-[var(--glass-border)] hover:border-primary/50 hover:shadow-[0_0_24px_rgba(176,73,31,0.15)] overflow-hidden ${project.featured ? ' featured-card-glow' : ''}`}
+    >
+      {/* Vercel-style mouse follow glow */}
+      <div 
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 z-0" 
+        style={{ 
+          background: 'radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(176,73,31,0.12), transparent 40%)' 
+        }} 
+      />
+      
+      <div className="relative z-10">
         <div className="flex items-start justify-between mb-3 border-b border-[var(--color-borderCustom)] pb-3">
           <div>
             <h3 className="text-h3 font-semibold text-textPrimary leading-tight mb-1">
@@ -62,7 +68,7 @@ export default function ProjectCard({ project }: { project: ProjectData }) {
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-4 border-t border-[var(--color-borderCustom)]">
+      <div className="relative z-10 flex items-center justify-between mt-auto pt-4 border-t border-[var(--color-borderCustom)]">
         <div className="flex items-center gap-2 overflow-hidden">
           {project.tags.slice(0, 2).map((tag) => (
             <span

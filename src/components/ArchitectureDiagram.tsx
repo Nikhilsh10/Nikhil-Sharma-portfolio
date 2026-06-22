@@ -1,6 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+
 export default function ArchitectureDiagram() {
+  const [activeStage, setActiveStage] = useState<number | null>(null);
+
   const pipeline = [
     {
       layer: 'Data Layer',
@@ -42,17 +46,43 @@ export default function ArchitectureDiagram() {
 
         <div className="relative">
           {/* Connecting Line (Mobile: Vertical, Desktop: Horizontal) */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[var(--color-borderCustom)] hidden md:block -translate-y-1/2 z-0" />
-          <div className="absolute top-0 bottom-0 left-8 w-0.5 bg-[var(--color-borderCustom)] md:hidden z-0" />
+          <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-[var(--color-borderCustom)] hidden md:block -translate-y-1/2 z-0 overflow-hidden rounded-full">
+            <div 
+              className="h-full bg-primary opacity-30 w-1/3"
+              style={{
+                animation: 'architecture-flow 3s ease-in-out infinite',
+                boxShadow: '0 0 10px var(--color-primary)'
+              }}
+            />
+          </div>
+          <div className="absolute top-8 bottom-8 left-[35px] w-0.5 bg-[var(--color-borderCustom)] md:hidden z-0 overflow-hidden rounded-full">
+            <div 
+              className="w-full bg-primary opacity-30 h-1/3"
+              style={{
+                animation: 'architecture-flow-y 3s ease-in-out infinite',
+                boxShadow: '0 0 10px var(--color-primary)'
+              }}
+            />
+          </div>
 
           <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-4 relative z-10">
             {pipeline.map((stage, idx) => (
               <div key={idx} className="flex-1 flex flex-col pl-16 md:pl-0">
                 {/* Mobile connection dot */}
-                <div className="absolute left-[31px] md:hidden w-2.5 h-2.5 rounded-full bg-primary mt-6" />
+                <div className={`absolute left-[31px] md:hidden w-2.5 h-2.5 rounded-full mt-6 transition-colors duration-300 ${activeStage === null || activeStage === idx ? 'bg-primary' : 'bg-[var(--color-borderCustom)]'}`} />
 
-                <div className={`border ${stage.color} rounded-card p-6 h-full backdrop-blur-sm transition-transform hover:-translate-y-1 duration-300`}>
-                  <div className={`text-micro font-bold uppercase tracking-widest mb-4 ${stage.textColor}`}>
+                <div 
+                  onMouseEnter={() => setActiveStage(idx)}
+                  onMouseLeave={() => setActiveStage(null)}
+                  className={`border ${stage.color} rounded-card p-6 h-full backdrop-blur-sm transition-all duration-300 cursor-default ${
+                    activeStage !== null && activeStage !== idx 
+                      ? 'opacity-30 scale-[0.98] grayscale' 
+                      : activeStage === idx 
+                        ? '-translate-y-2 shadow-[0_8px_32px_rgba(0,0,0,0.1)] border-opacity-60 scale-100' 
+                        : 'hover:-translate-y-1 scale-100'
+                  }`}
+                >
+                  <div className={`text-micro font-bold uppercase tracking-widest mb-4 transition-colors ${activeStage !== null && activeStage !== idx ? 'text-textTertiary' : stage.textColor}`}>
                     {stage.layer}
                   </div>
                   <div className="flex flex-col gap-3">

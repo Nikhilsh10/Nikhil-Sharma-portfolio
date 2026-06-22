@@ -20,7 +20,8 @@
   --color-nav: rgba(250, 248, 244, 0.85);
 
   /* === TYPOGRAPHY === */
-  --font-sans: "Inter", sans-serif;
+  --font-sans: var(--font-inter, "Inter"), sans-serif;
+  --font-heading: var(--font-outfit, "Outfit"), sans-serif;
 
   /* Hero headline */
   --text-display: 3rem;
@@ -91,6 +92,11 @@
   ::selection {
     background: var(--color-primary);
     color: white;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
   }
 }
 
@@ -178,6 +184,16 @@
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+@keyframes architecture-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes architecture-flow-y {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
 }
 
 /* Orb animations */
