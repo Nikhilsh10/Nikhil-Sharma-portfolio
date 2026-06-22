@@ -112,7 +112,7 @@ export default function Hero() {
 
           <Link
             href="#work"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-[var(--color-borderCustom)] text-textPrimary text-body font-medium rounded-btn hover:bg-surface/60 hover:border-[var(--color-borderHover)] active:scale-[0.97] transition-all focus-ring"
+            className="inline-flex items-center gap-2 px-6 h-[44px] glass-panel text-textPrimary text-body font-medium rounded-btn active:scale-[0.97] focus-ring"
           >
             See projects
           </Link>
@@ -120,7 +120,7 @@ export default function Hero() {
 
         {/* Stats bar */}
         <div
-          className="flex flex-wrap items-center gap-x-12 gap-y-6 pt-8 border-t border-[var(--color-borderCustom)]"
+          className="flex flex-wrap items-center gap-x-12 gap-y-6 glass-panel rounded-card px-6 pt-8 pb-6"
           role="list"
           aria-label="Key statistics"
         >
