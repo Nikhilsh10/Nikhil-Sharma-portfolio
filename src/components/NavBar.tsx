@@ -62,10 +62,13 @@ export default function NavBar() {
       <nav
         className="fixed top-0 left-0 right-0 z-50 flex items-center h-[52px] border-b-[0.5px] px-4 md:px-8 xl:px-0 transition-all duration-200 ease-out"
         style={{
-          backgroundColor: scrolled ? 'var(--color-nav)' : 'transparent',
-          borderBottomColor: scrolled ? 'var(--color-borderCustom)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(14px)' : 'none',
-          WebkitBackdropFilter: scrolled ? 'blur(14px)' : 'none',
+          background: scrolled ? 'var(--glass-bg)' : 'transparent',
+          borderBottomColor: scrolled ? 'var(--glass-border)' : 'transparent',
+          backdropFilter: scrolled ? 'var(--glass-blur-strong)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'var(--glass-blur-strong)' : 'none',
+          boxShadow: scrolled
+            ? '0 1px 0 var(--glass-highlight) inset, 0 4px 24px rgba(0,0,0,0.15)'
+            : 'none',
         }}
       >
         <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between">

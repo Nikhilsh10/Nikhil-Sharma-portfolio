@@ -13,7 +13,7 @@ export interface ProjectData {
 
 export default function ProjectCard({ project }: { project: ProjectData }) {
   return (
-    <article className="group relative flex flex-col justify-between h-full bg-surface dark:bg-main border border-[var(--color-borderCustom)] rounded-card p-6 hover:border-[var(--color-borderHover)] hover:-translate-y-0.5 transition-all duration-200 ease-out">
+    <article className={`group relative flex flex-col justify-between h-full glass-panel rounded-card p-6 hover:-translate-y-1 transition-all duration-200 ease-out${project.featured ? ' featured-card-glow' : ''}`}>
       <div>
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-h3 font-semibold text-textPrimary leading-tight pr-4">
@@ -35,7 +35,7 @@ export default function ProjectCard({ project }: { project: ProjectData }) {
         </p>
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-4 border-t border-[var(--color-borderCustom)]">
+      <div className="flex items-center justify-between mt-auto pt-4 border-t" style={{ borderColor: 'var(--glass-border)' }}>
         <div className="flex items-center gap-2 overflow-hidden">
           {project.tags.slice(0, 2).map((tag) => (
             <span
