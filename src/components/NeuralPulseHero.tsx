@@ -57,10 +57,10 @@ interface Scene {
 function lerp(a: number, b: number, t: number): number { return a + (b - a) * t; }
 
 function edgeColor(b: number): string {
-  const r = (99  + 68 * b) | 0;
-  const g = (102 + 37 * b) | 0;
-  const bl= (241 +  9 * b) | 0;
-  return `rgba(${r},${g},${bl},${(0.08 + 0.47 * b).toFixed(3)})`;
+  const r = (217 - 41 * b) | 0;
+  const g = (123 - 50 * b) | 0;
+  const bl= (63 - 32 * b) | 0;
+  return `rgba(${r},${g},${bl},${(0.15 + 0.5 * b).toFixed(3)})`;
 }
 
 function buildNodes(w: number, h: number): NodeData[] {
@@ -139,24 +139,29 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
   // ── Canvas animation ──────────────────────────────────────────────────
   useEffect(() => {
     mountedRef.current = true;
-    const container = containerRef.current;
-    const canvas    = canvasRef.current;
-    if (!container || !canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    const noMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // We wrap initialization in requestIdleCallback so the heavy canvas
+    // setup logic doesn't block the main thread during initial page load,
+    // which massively improves the Lighthouse Performance score.
+    const startCanvas = () => {
+      const container = containerRef.current;
+      const canvas    = canvasRef.current;
+      if (!container || !canvas || !mountedRef.current) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    type NavConn = Navigator & { connection?: { saveData?: boolean } };
-    const saveData =
-      typeof navigator !== 'undefined' &&
-      (navigator as NavConn).connection?.saveData === true;
+      const noMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const rootInterval = saveData ? 3000 : ROOT_INTERVAL_MS;
+      type NavConn = Navigator & { connection?: { saveData?: boolean } };
+      const saveData =
+        typeof navigator !== 'undefined' &&
+        (navigator as NavConn).connection?.saveData === true;
 
-    const resize = () => {
+      const rootInterval = saveData ? 3000 : ROOT_INTERVAL_MS;
+
+      const resize = () => {
       const w = container.offsetWidth;
       const h = container.offsetHeight;
       canvas.width  = w;
@@ -282,7 +287,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         const t = sc.nodes[e.toIdx];
         ctx.beginPath();
         ctx.arc(lerp(f.x, t.x, sig.progress), lerp(f.y, t.y, sig.progress), 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(167,139,250,0.95)';
+        ctx.fillStyle = 'rgba(176,73,31,0.95)';
         ctx.fill();
       }
 
@@ -290,13 +295,13 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
       for (const node of sc.nodes) {
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius * NODE_GLOW_MULT, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(139,92,246,0.15)';
+        ctx.fillStyle = 'rgba(217,123,63,0.15)';
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle   = 'rgba(99,102,241,0.35)';
-        ctx.strokeStyle = 'rgba(139,92,246,0.6)';
+        ctx.fillStyle   = 'rgba(217,123,63,0.25)';
+        ctx.strokeStyle = 'rgba(176,73,31,0.7)';
         ctx.lineWidth   = 1.2;
         ctx.fill();
         ctx.stroke();
@@ -318,21 +323,34 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
-    return () => {
-      mountedRef.current = false;
-      cancelAnimationFrame(rafId);
-      ro.disconnect();
-      document.removeEventListener('mousemove', onMouse);
-      pendingTids.current.forEach(t => clearTimeout(t));
-      pendingTids.current.clear();
-    };
-  }, []);
+    return { rafId, onMouse, ro };
+  };
+
+  let cleanups: { rafId: number, onMouse: (e: MouseEvent) => void, ro: ResizeObserver } | null = null;
+  const ricId = typeof requestIdleCallback !== 'undefined' ? requestIdleCallback(() => {
+    cleanups = startCanvas() || null;
+  }) : setTimeout(() => { cleanups = startCanvas() || null; }, 1);
+
+  return () => {
+    mountedRef.current = false;
+    if (typeof cancelIdleCallback !== 'undefined') cancelIdleCallback(ricId as number);
+    else clearTimeout(ricId as number);
+    
+    if (cleanups) {
+      cancelAnimationFrame(cleanups.rafId);
+      cleanups.ro.disconnect();
+      document.removeEventListener('mousemove', cleanups.onMouse);
+    }
+    pendingTids.current.forEach(t => clearTimeout(t));
+    pendingTids.current.clear();
+  };
+}, []);
 
   // ─── Render ──────────────────────────────────────────────────────────
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={{ minHeight: '100svh', background: '#0a0a14' }}
+      style={{ minHeight: '100svh' }}
     >
       {/* Canvas */}
       <div ref={containerRef} className="absolute inset-0">
@@ -345,14 +363,14 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
         {/* Eyebrow badge */}
         <div style={{ ...fadeUp(0.1), marginBottom: '1.5rem' }}>
           <div style={{
-            border: '1px solid rgba(139,92,246,0.4)',
-            background: 'rgba(99,102,241,0.1)',
+            border: '1px solid rgba(176,73,31,0.3)',
+            background: 'rgba(176,73,31,0.05)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             borderRadius: '999px',
             padding: '6px 18px',
           }}>
-            <span style={{ fontSize: 12, letterSpacing: '0.12em', color: 'rgba(167,139,250,0.9)' }}>
+            <span style={{ fontSize: 12, letterSpacing: '0.12em', color: 'var(--color-primary)' }}>
               Machine Learning · Data · AI
             </span>
           </div>
@@ -364,7 +382,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
           style={{
             fontSize: 'clamp(2.4rem, 5vw, 4.5rem)',
             fontWeight: 600,
-            color: '#f5f5ff',
+            color: 'var(--color-textPrimary)',
             lineHeight: 1.1,
             marginBottom: '0.75rem',
             animation: 'nph-slide-up 0.5s ease 0.2s both',
@@ -375,16 +393,16 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
 
         {/* Typewriter */}
         <div style={{ ...fadeUp(0.4), fontSize: '1.25rem', fontWeight: 400, marginBottom: '1rem', textAlign: 'center' }}>
-          <span style={{ color: 'rgba(200,200,220,0.5)' }}>I build as a </span>
-          <span style={{ color: 'rgba(167,139,250,0.85)' }}>{displayed}</span>
+          <span style={{ color: 'var(--color-textSecondary)' }}>I build as a </span>
+          <span style={{ color: 'var(--color-primary)' }}>{displayed}</span>
           <span
             aria-hidden="true"
-            style={{ color: 'rgba(167,139,250,0.85)', display: 'inline-block', width: 2, opacity: cursorOn ? 1 : 0, transition: 'opacity 80ms' }}
+            style={{ color: 'var(--color-primary)', display: 'inline-block', width: 2, opacity: cursorOn ? 1 : 0, transition: 'opacity 80ms' }}
           >|</span>
         </div>
 
         {/* Bio */}
-        <p style={{ ...fadeUp(0.55), fontSize: 15, color: 'rgba(180,180,210,0.55)', maxWidth: 480, lineHeight: 1.7, textAlign: 'center', marginBottom: '2rem' }}>
+        <p style={{ ...fadeUp(0.55), fontSize: 15, color: 'var(--color-textSecondary)', maxWidth: 480, lineHeight: 1.7, textAlign: 'center', marginBottom: '2rem' }}>
           Turning raw data into decisions. Neural nets to dashboards.
         </p>
 
@@ -393,7 +411,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
           <a
             href="#work"
             style={{
-              background: 'rgba(99,102,241,0.85)',
+              background: 'var(--color-primary)',
               color: '#fff',
               borderRadius: 8,
               padding: '11px 28px',
@@ -405,8 +423,8 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               display: 'inline-block',
               transition: 'background 200ms, transform 200ms',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.9)'; e.currentTarget.style.transform = 'scale(1.03)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.85)'; e.currentTarget.style.transform = 'scale(1)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-secondary)'; e.currentTarget.style.transform = 'scale(1.03)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             View Projects
           </a>
@@ -415,8 +433,8 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
             download
             style={{
               background: 'transparent',
-              color: 'rgba(167,139,250,0.9)',
-              border: '1px solid rgba(139,92,246,0.45)',
+              color: 'var(--color-primary)',
+              border: '1px solid rgba(176,73,31,0.4)',
               borderRadius: 8,
               padding: '11px 28px',
               fontSize: 14,
@@ -427,8 +445,8 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               display: 'inline-block',
               transition: 'background 200ms, border-color 200ms',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.8)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.45)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(176,73,31,0.1)'; e.currentTarget.style.borderColor = 'var(--color-secondary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(176,73,31,0.4)'; }}
           >
             Download CV
           </a>
@@ -451,7 +469,7 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
           zIndex: 10,
         }}
       >
-        <div style={{ position: 'relative', width: 2, height: 36, background: 'rgba(139,92,246,0.4)', borderRadius: 1, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', width: 2, height: 36, background: 'rgba(176,73,31,0.2)', borderRadius: 1, overflow: 'hidden' }}>
           <div
             style={{
               position: 'absolute',
@@ -460,12 +478,12 @@ export default function NeuralPulseHero(_props: NeuralPulseHeroProps) {
               width: 5,
               height: 5,
               borderRadius: '50%',
-              background: 'rgba(139,92,246,0.8)',
+              background: 'var(--color-primary)',
               animation: 'nph-scroll-dot 1.4s ease-in-out infinite',
             }}
           />
         </div>
-        <span style={{ fontSize: 10, letterSpacing: '0.15em', color: 'rgba(139,92,246,0.5)', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 10, letterSpacing: '0.15em', color: 'rgba(176,73,31,0.6)', textTransform: 'uppercase' }}>
           scroll
         </span>
       </div>

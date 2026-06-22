@@ -208,7 +208,7 @@
 
 /* ── NeuralPulseHero animations ── */
 @keyframes nph-fade-up {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0.6; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
