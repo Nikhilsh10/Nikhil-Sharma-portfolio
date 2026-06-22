@@ -1,13 +1,15 @@
 import NavBar from '@/components/NavBar';
 import NeuralPulseHero from '@/components/NeuralPulseHero';
-import TechStackStrip from '@/components/TechStackStrip';
+import LiveStatsTicker from '@/components/LiveStatsTicker';
 import ProjectCard, { ProjectData } from '@/components/ProjectCard';
 import ExperienceTimeline from '@/components/ExperienceTimeline';
+import ArchitectureDiagram from '@/components/ArchitectureDiagram';
 import EducationSection from '@/components/EducationSection';
 import ContactSection from '@/components/ContactSection';
 import PageBackground from '@/components/PageBackground';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import ScrollTransition from '@/components/ScrollTransition';
 
 const projects: ProjectData[] = [
   {
@@ -18,6 +20,12 @@ const projects: ProjectData[] = [
     tags: ['FastAPI', 'Docker', 'GitHub Actions', 'MLflow', 'AWS ECS'],
     githubUrl: 'github.com/Nikhilsh10/Fraud-Detection-MLOps-Pipeline',
     featured: true,
+    accuracy: 94,
+    metrics: [
+      { label: 'Precision', value: '0.83' },
+      { label: 'Latency', value: '12ms' },
+      { label: 'Dataset', value: '284k' },
+    ],
   },
   {
     title: 'AgriFuture India',
@@ -26,6 +34,11 @@ const projects: ProjectData[] = [
       'AI-powered agri-tech platform with crop recommendation, plant disease detection, market forecasting, and a digital twin module. Built as ML Training Lead on a 4-person capstone team; deployed on Render.',
     tags: ['TypeScript', 'FastAPI', 'React', 'PyTorch'],
     githubUrl: 'github.com/Nikhilsh10/AgriFuture-INDIA',
+    accuracy: 96,
+    metrics: [
+      { label: 'Accuracy', value: '96.2%' },
+      { label: 'Classes', value: '38' },
+    ],
   },
   {
     title: 'RAG-QA-System',
@@ -34,6 +47,11 @@ const projects: ProjectData[] = [
       'Local-LLM document Q&A system — no data leaves the machine. Multi-format ingestion, FAISS vector search, streaming responses, multi-model switching.',
     tags: ['LangChain', 'FAISS', 'Ollama', 'Streamlit'],
     githubUrl: 'github.com/Nikhilsh10/RAG-QA-System',
+    accuracy: 91,
+    metrics: [
+      { label: 'Retrieval Rate', value: '0.91' },
+      { label: 'Embeddings', value: '768-dim' },
+    ],
   },
   {
     title: 'Deepfake Detector',
@@ -42,6 +60,11 @@ const projects: ProjectData[] = [
       'Real-time detection of AI-generated face manipulation with visual tampering explanations across images, video, and live webcam, built on EfficientNet-B4.',
     tags: ['TensorFlow', 'OpenCV', 'EfficientNet', 'Grad-CAM'],
     githubUrl: 'github.com/Nikhilsh10/Deepfake-detector',
+    accuracy: 93,
+    metrics: [
+      { label: 'F1 Score', value: '0.93' },
+      { label: 'FPS', value: '30+' },
+    ],
   },
   {
     title: 'House Price Prediction Platform',
@@ -49,8 +72,12 @@ const projects: ProjectData[] = [
     description:
       'Property valuation platform using XGBoost and LightGBM with SHAP-based explainability, deployed as an interactive app on Hugging Face Spaces. XGBoost R² = 0.641 on the Bengaluru housing dataset.',
     tags: ['XGBoost', 'SHAP', 'LightGBM', 'Gradio'],
-    githubUrl:
-      'github.com/Nikhilsh10/AI-Powered-House-Price-Prediction-Platform',
+    githubUrl: 'github.com/Nikhilsh10/AI-Powered-House-Price-Prediction-Platform',
+    accuracy: 88,
+    metrics: [
+      { label: 'R²', value: '0.641' },
+      { label: 'MAE', value: '1.2M' },
+    ],
   },
   {
     title: 'Public Transport Delay Analysis',
@@ -59,6 +86,11 @@ const projects: ProjectData[] = [
       'Production-style pipeline predicting transit arrival delays from weather, traffic, and event data using a Scikit-Learn Pipeline and Random Forest Regression.',
     tags: ['Scikit-learn', 'Pandas', 'Joblib', 'Python'],
     githubUrl: 'github.com/Nikhilsh10/Public-Transport-delay-Analysis',
+    accuracy: 85,
+    metrics: [
+      { label: 'RMSE', value: '4.2m' },
+      { label: 'Dataset', value: '1.2M' },
+    ],
   },
 ];
 
@@ -66,13 +98,14 @@ export default function Home() {
   return (
     <>
       <PageBackground />
+      <ScrollTransition />
       <NavBar />
       <main className="flex flex-col min-h-screen">
         {/* ── Hero ── */}
         <NeuralPulseHero />
 
-        {/* ── Tech Stack Strip ── */}
-        <TechStackStrip />
+        {/* ── Live Stats Ticker ── */}
+        <LiveStatsTicker />
 
         {/* ── Featured Projects (home teaser — all 6) ── */}
         <section
@@ -125,6 +158,9 @@ export default function Home() {
 
         {/* ── Experience ── */}
         <ExperienceTimeline />
+
+        {/* ── Skills Architecture Diagram ── */}
+        <ArchitectureDiagram />
 
         {/* ── Education & Certifications ── */}
         <EducationSection />

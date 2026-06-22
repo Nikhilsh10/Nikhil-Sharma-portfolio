@@ -17,9 +17,14 @@ export default function Footer() {
       }}
     >
       <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <span className="text-caption text-textTertiary">
-          &copy; 2026 Nikhil Sharma
-        </span>
+        <div className="flex flex-col gap-1">
+          <span className="text-micro font-semibold text-textSecondary uppercase tracking-wider">
+            Model: Nikhil Sharma v1.0 <span className="text-primary/40 mx-1">·</span> Status: Open to opportunities
+          </span>
+          <span className="text-[10px] text-textTertiary uppercase tracking-widest flex items-center gap-2">
+            Trained on: 4 years of data <span className="text-primary/40">·</span> Loss: decreasing <span className="text-success font-bold text-micro">↓</span>
+          </span>
+        </div>
         <nav aria-label="Social links">
           <ul className="flex items-center gap-6" role="list">
             {socialLinks.map(({ label, href }) => (

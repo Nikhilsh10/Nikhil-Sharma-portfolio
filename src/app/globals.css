@@ -227,3 +227,15 @@
 @media (prefers-reduced-motion: reduce) {
   [class^="nph-"] { animation: none !important; opacity: 1 !important; }
 }
+
+/* ── LiveStatsTicker marquee ── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

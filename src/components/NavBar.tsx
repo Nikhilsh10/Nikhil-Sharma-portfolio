@@ -82,6 +82,20 @@ export default function NavBar() {
 
           {/* Desktop nav */}
           <div className="hidden sm:flex items-center gap-1 text-bodySm">
+            {/* Ambient indicator */}
+            <div className="group relative flex items-center gap-2 mr-4 text-textSecondary cursor-default px-2 py-1 rounded-micro hover:bg-surfaceHover transition-colors">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+              </span>
+              <span className="text-micro tracking-widest uppercase font-semibold">Training</span>
+              {/* Tooltip */}
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-max opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all pointer-events-none bg-surface border border-[var(--color-borderCustom)] rounded-card px-4 py-3 shadow-lg z-50 origin-top">
+                <div className="text-micro font-semibold text-textPrimary mb-0.5">Project: Neural Network Tuning</div>
+                <div className="text-[10px] text-textTertiary uppercase tracking-wide">Started: June 2026</div>
+              </div>
+            </div>
+
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -117,6 +131,15 @@ export default function NavBar() {
 
           {/* Mobile controls */}
           <div className="flex sm:hidden items-center gap-2">
+            {/* Mobile ambient indicator (no tooltip) */}
+            <div className="flex items-center gap-1.5 mr-2 text-textSecondary px-2 py-1 rounded-micro bg-surfaceHover/50">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success"></span>
+              </span>
+              <span className="text-[9px] tracking-widest uppercase font-bold">Training</span>
+            </div>
+
             <button
               onClick={toggleTheme}
               className="w-11 h-11 flex items-center justify-center text-textSecondary focus-ring rounded-micro"

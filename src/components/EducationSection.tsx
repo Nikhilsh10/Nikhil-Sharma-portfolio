@@ -23,7 +23,7 @@ export default function EducationSection() {
       <div className="max-w-[1280px] mx-auto">
         <div className="flex flex-col gap-2 mb-12">
           <span className="text-micro font-semibold tracking-[0.15em] uppercase text-primary opacity-70">
-            03 / About
+            04 / About
           </span>
           <h2
             id="about-heading"

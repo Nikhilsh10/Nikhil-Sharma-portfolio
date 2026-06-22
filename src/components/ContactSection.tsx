@@ -45,7 +45,7 @@ export default function ContactSection() {
       <div className="max-w-[1280px] mx-auto">
         <div className="flex flex-col gap-2 mb-12">
           <span className="text-micro font-semibold tracking-[0.15em] uppercase text-primary opacity-70">
-            04 / Contact
+            05 / Contact
           </span>
         </div>
 
