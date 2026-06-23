@@ -1,5 +1,8 @@
 # Nikhil Sharma — AI/ML Engineer Portfolio
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/nikhilsharma10portfolio/deploy-status)](https://nikhilsharma10portfolio.netlify.app/)
+**Live Demo:** [https://nikhilsharma10portfolio.netlify.app/](https://nikhilsharma10portfolio.netlify.app/)
+
 A high-performance, single-page developer portfolio featuring a custom HTML5 Canvas Neural Network hero centerpiece, sophisticated micro-interactions, and a perfect Lighthouse score. 
 
 Built with **Next.js 15**, **React 18**, and **Tailwind CSS v4**.
