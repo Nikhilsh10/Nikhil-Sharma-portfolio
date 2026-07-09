@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+@theme {
+  /* === GRAPHITE & EMBER COLOR SYSTEM === */
+  --color-primary: #B0491F;
+  --color-success: #1D9E75;
+  --color-featured: #BA7517;
+  --color-secondary: #D97B3F;
+
+  --color-surface: #F1EFE8;
+  --color-surfaceHover: #E8E5DA;
+  --color-textPrimary: #111111;
+  --color-textSecondary: #5F5E5A;
+  --color-textTertiary: #73726B;
+  --color-borderCustom: rgba(0, 0, 0, 0.15);
+  --color-borderHover: rgba(0, 0, 0, 0.25);
+
+  /* Warm off-white (updated from plain white) */
+  --color-main: #FAF8F4;
+  --color-nav: rgba(250, 248, 244, 0.85);
+
+  /* === TYPOGRAPHY === */
+  --font-sans: var(--font-inter, "Inter"), sans-serif;
+  --font-heading: var(--font-outfit, "Outfit"), sans-serif;
+
+  /* Hero headline */
+  --text-display: 3rem;
+  --text-h1: 22px;
+  --text-h2: 18px;
+  --text-h3: 16px;
+  --text-bodyLg: 16px;
+  --text-body: 14px;
+  --text-bodySm: 13px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+
+  /* === RADII === */
+  --radius-micro: 4px;
+  --radius-btn: 8px;
+  --radius-card: 12px;
+  --radius-pill: 20px;
+
+  /* === TRANSITIONS === */
+  --duration-btn-hover: 150ms;
+  --duration-hover: 200ms;
+
+  /* Glass UI tokens */
+  --bg-base: #FAF8F4;
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-hover: rgba(255, 255, 255, 0.70);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-border-hover: rgba(255, 255, 255, 0.90);
+  --glass-highlight: rgba(255, 255, 255, 0.90);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.95) inset;
+  --glass-shadow-hover: 0 16px 48px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,1) inset;
+  --glass-blur: blur(20px);
+  --glass-blur-strong: blur(28px);
+}
+
+@layer base {
+  .dark {
+    --color-primary: #E8915F;
+    --color-success: #5DCAA5;
+    --color-featured: #EF9F27;
+    --color-secondary: #F2A268;
+
+    --color-surface: #1C1C1C;
+    --color-surfaceHover: #252525;
+    --color-textPrimary: #EFEFEF;
+    --color-textSecondary: #B4B2A9;
+    --color-textTertiary: #888780;
+    --color-borderCustom: rgba(255, 255, 255, 0.12);
+    --color-borderHover: rgba(255, 255, 255, 0.22);
+
+    /* True graphite */
+    --color-main: #121212;
+    --color-nav: rgba(18, 18, 18, 0.88);
+
+    /* Glass UI dark overrides */
+    --bg-base: #121212;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-bg-hover: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --glass-border-hover: rgba(255, 255, 255, 0.18);
+    --glass-highlight: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.40), 0 1px 0 rgba(255,255,255,0.07) inset;
+    --glass-shadow-hover: 0 16px 48px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.10) inset;
+    --glass-blur: blur(20px);
+    --glass-blur-strong: blur(28px);
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-main;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .glass-panel:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-hover);
+  }
+
+  .featured-card-glow {
+    border-color: rgba(176,73,31,0.40) !important;
+    box-shadow: var(--glass-shadow),
+      0 0 0 1px rgba(176,73,31,0.20),
+      0 0 24px rgba(176,73,31,0.12),
+      0 0 48px rgba(176,73,31,0.06);
+  }
+  .dark .featured-card-glow {
+    border-color: rgba(232,145,95,0.35) !important;
+    box-shadow: var(--glass-shadow),
+      0 0 0 1px rgba(232,145,95,0.18),
+      0 0 24px rgba(232,145,95,0.10),
+      0 0 48px rgba(232,145,95,0.05);
+  }
+  .featured-card-glow:hover {
+    box-shadow: var(--glass-shadow-hover),
+      0 0 0 1px rgba(232,145,95,0.30),
+      0 0 36px rgba(232,145,95,0.16),
+      0 0 64px rgba(232,145,95,0.08);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 500ms cubic-bezier(0.4,0,0.2,1),
+                transform 500ms cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal:nth-child(2) { transition-delay: 60ms; }
+  .reveal:nth-child(3) { transition-delay: 120ms; }
+  .reveal:nth-child(4) { transition-delay: 180ms; }
+  .reveal:nth-child(5) { transition-delay: 240ms; }
+  .reveal:nth-child(6) { transition-delay: 300ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  :root .orb-1, :root .orb-2, :root .orb-3 { opacity: 0.6; }
+  .dark .orb-1, .dark .orb-2, .dark .orb-3 { opacity: 1; }
+}
+
+/* === HERO ANIMATIONS === */
+@keyframes hero-glow-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.12); }
+}
+@keyframes status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow-anim { animation: none !important; }
+  .status-pulse-anim { animation: none !important; }
+}
+
+
+/* Full-page ambient gradient */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes architecture-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes architecture-flow-y {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+/* Orb animations */
+@keyframes orb-float-1 { 0%,100% { transform: translate(0px,0px) scale(1); } 33% { transform: translate(30px,-20px) scale(1.05); } 66% { transform: translate(-20px,15px) scale(0.97); } }
+@keyframes orb-float-2 { 0%,100% { transform: translate(0px,0px) scale(1); } 33% { transform: translate(-25px,20px) scale(1.03); } 66% { transform: translate(20px,-15px) scale(0.98); } }
+@keyframes orb-float-3 { 0%,100% { transform: translate(0px,0px) scale(1); } 50% { transform: translate(15px,25px) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .orb-1, .orb-2, .orb-3 { animation: none !important; } }
+
+/* Page background utility */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-base);
+}
+
+/* Orb classes */
+.orb-1 { animation: orb-float-1 18s ease-in-out infinite; }
+.orb-2 { animation: orb-float-2 22s ease-in-out infinite; }
+.orb-3 { animation: orb-float-3 14s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-1, .orb-2, .orb-3 { animation: none !important; }
+}
+
+/* ── NeuralPulseHero animations ── */
+@keyframes nph-fade-up {
+  from { opacity: 0.6; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Slide-in only (no opacity) — keeps h1 in LCP paint immediately */
+@keyframes nph-slide-up {
+  from { transform: translateY(20px); opacity: 0.7; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+
+@keyframes nph-scroll-dot {
+  0%   { top: 0px;  }
+  80%  { top: 31px; }
+  100% { top: 31px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class^="nph-"] { animation: none !important; opacity: 1 !important; }
+}
+
+/* ── LiveStatsTicker marquee ── */
+@keyframes marquee {
+  0% { transform: translateX(0) translateZ(0); }
+  100% { transform: translateX(-50%) translateZ(0); }
+}
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover, .animate-marquee:focus-within {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) { 
+  .animate-marquee { animation: none !important; transform: none !important; } 
+}
